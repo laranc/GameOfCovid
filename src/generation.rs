@@ -151,13 +151,13 @@ fn check_cell(
         match current_state {
             CellState::Alive => match rules.living_rule {
                 Rules::Single(_) => {
-                    if live_neighbors < rules.living_rule.clone().value()[0] {
+                    if live_neighbors < rules.living_rule.value()[0] {
                         CellState::Dead
-                    } else if live_neighbors == rules.living_rule.clone().value()[0]
-                        || live_neighbors == rules.living_rule.clone().value()[0] + 1
+                    } else if live_neighbors == rules.living_rule.value()[0]
+                        || live_neighbors == rules.living_rule.value()[0] + 1
                     {
                         CellState::Alive
-                    } else if live_neighbors > rules.living_rule.clone().value()[0] + 1
+                    } else if live_neighbors > rules.living_rule.value()[0] + 1
                         || infected_neighbors >= rules.virulence
                     {
                         CellState::Infected
@@ -166,9 +166,9 @@ fn check_cell(
                     }
                 }
                 Rules::Range { min: _, max: _ } => {
-                    if !rules.living_rule.clone().in_range(live_neighbors) {
+                    if !rules.living_rule.in_range(&live_neighbors) {
                         CellState::Dead
-                    } else if live_neighbors > rules.living_rule.clone().value()[1] + 1
+                    } else if live_neighbors > rules.living_rule.value()[1] + 1
                         || infected_neighbors >= rules.virulence
                     {
                         CellState::Infected
@@ -177,9 +177,9 @@ fn check_cell(
                     }
                 }
                 Rules::Singles(_) => {
-                    if !rules.living_rule.clone().in_range(live_neighbors) {
+                    if !rules.living_rule.in_range(&live_neighbors) {
                         CellState::Dead
-                    } else if live_neighbors > *rules.living_rule.clone().value().last().unwrap()
+                    } else if live_neighbors > *rules.living_rule.value().last().unwrap()
                         || infected_neighbors >= rules.virulence
                     {
                         CellState::Infected
@@ -191,21 +191,21 @@ fn check_cell(
             },
             CellState::Dead => match rules.dead_rule {
                 Rules::Single(_) => {
-                    if live_neighbors == rules.dead_rule.clone().value()[0] {
+                    if live_neighbors == rules.dead_rule.value()[0] {
                         CellState::Alive
                     } else {
                         CellState::Dead
                     }
                 }
                 Rules::Range { min: _, max: _ } => {
-                    if rules.dead_rule.clone().in_range(live_neighbors) {
+                    if rules.dead_rule.in_range(&live_neighbors) {
                         CellState::Alive
                     } else {
                         CellState::Dead
                     }
                 }
                 Rules::Singles(_) => {
-                    if rules.dead_rule.clone().in_range(live_neighbors) {
+                    if rules.dead_rule.in_range(&live_neighbors) {
                         CellState::Alive
                     } else {
                         CellState::Dead

@@ -1,5 +1,5 @@
 use bevy::prelude::*;
-use bevy_egui::EguiPlugin;
+use bevy_egui::{egui, EguiContext, EguiPlugin};
 
 mod ascii;
 mod components;
@@ -56,15 +56,16 @@ fn main() {
         })
         .init_resource::<CellStates>()
         .add_plugins(DefaultPlugins)
-        .add_plugin(EguiPlugin)
-        .add_plugin(DebugPlugin)
         .add_plugin(AsciiPlugin)
+        .add_plugin(EguiPlugin)
         .add_plugin(GridPlugin)
-        .add_plugin(GenerationPlugin)
+        .add_plugin(DebugPlugin)
         .add_plugin(RulesMenuPlugin)
+        .add_plugin(GenerationPlugin)
         .add_plugin(ResultMenuPlugin)
         .add_startup_system(setup_system)
         .add_system(game_state_system)
+        .add_system(controls_panel_system)
         .run();
 }
 
@@ -102,4 +103,15 @@ fn game_state_system(mut state: ResMut<State<GameState>>, keyboard: Res<Input<Ke
                 .expect("Failed to change state to Complete"),
         }
     }
+}
+
+fn controls_panel_system(mut egui_ctx: ResMut<EguiContext>) {
+    egui::TopBottomPanel::bottom("Controls").show(egui_ctx.ctx_mut(), |ui| {
+        ui.horizontal(|ui| {
+            ui.label("Use [W][A][S][D] to move the cursor.");
+            ui.label("Press [SPACE] to change the cell.");
+            ui.label("Press [E] to to start and stop the game.");
+            ui.label("Press [F] to conclude the game.");
+        });
+    });
 }

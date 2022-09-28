@@ -1,7 +1,7 @@
 use bevy::prelude::*;
-use bevy_inspector_egui::{RegisterInspectable, WorldInspectorPlugin};
+use bevy_inspector_egui::{InspectorPlugin, RegisterInspectable, WorldInspectorPlugin};
 
-use crate::components::*;
+use crate::{components::*, resources::*};
 
 pub struct DebugPlugin;
 
@@ -10,7 +10,8 @@ impl Plugin for DebugPlugin {
         if cfg!(debug_assertions) {
             app.add_plugin(WorldInspectorPlugin::new())
                 .register_inspectable::<AsciiSheet>()
-                .register_inspectable::<CellComponent>();
+                .register_inspectable::<CellComponent>()
+                .add_plugin(InspectorPlugin::<Rule>::new());
         }
     }
 }

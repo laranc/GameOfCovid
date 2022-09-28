@@ -1,4 +1,5 @@
 use crate::{components::CellState, grid::MAP_SIZE};
+use bevy_inspector_egui::Inspectable;
 
 #[derive(Default)]
 pub struct CursorPosition(pub usize, pub usize);
@@ -14,7 +15,7 @@ impl Default for CellStates {
     }
 }
 
-#[derive(Default, Eq, PartialEq, Clone)]
+#[derive(Default, Eq, PartialEq, Clone, Inspectable)]
 pub enum Rules {
     Single(u8),
     Range {
@@ -27,15 +28,15 @@ pub enum Rules {
 }
 
 impl Rules {
-    pub fn value(self) -> Vec<u8> {
+    pub fn value(&self) -> Vec<u8> {
         match self {
-            Self::Single(i) => vec![i],
-            Self::Range { min: l, max: u } => vec![l, u],
-            Self::Singles(v) => v,
+            Self::Single(i) => vec![*i],
+            Self::Range { min: l, max: u } => vec![*l, *u],
+            Self::Singles(v) => v.clone(),
             _ => panic!("Error, cannot return value from default rule"),
         }
     }
-    pub fn in_range(self, num: u8) -> bool {
+    pub fn in_range(&self, num: &u8) -> bool {
         match self {
             Self::Single(i) => {
                 if num == i {
@@ -45,8 +46,8 @@ impl Rules {
                 }
             }
             Self::Range { min: l, max: u } => {
-                for i in l..=u {
-                    if num == i {
+                for i in *l..=*u {
+                    if num == &i {
                         return true;
                     }
                 }
@@ -65,7 +66,7 @@ impl Rules {
     }
 }
 
-#[derive(Eq, PartialEq, Clone)]
+#[derive(Eq, PartialEq, Clone, Inspectable)]
 pub struct GameRules {
     pub living_rule: Rules,
     pub dead_rule: Rules,
@@ -82,5 +83,37 @@ impl Default for GameRules {
     }
 }
 
-#[derive(Default)]
+#[derive(Default, Inspectable)]
 pub struct Rule(pub GameRules);
+
+pub struct SelectedRule {
+    pub single: bool,
+    pub range: bool,
+    pub singles: bool,
+    pub default: bool,
+    pub single_value: u8,
+    pub range_value: (u8, u8),
+    pub singles_value: String,
+}
+
+impl Default for SelectedRule {
+    fn default() -> Self {
+        Self {
+            single: false,
+            range: false,
+            singles: false,
+            default: true,
+            single_value: 2,
+            range_value: (0, 2),
+            singles_value: "2".to_string(),
+        }
+    }
+}
+
+pub struct CurrentRule(pub SelectedRule, pub SelectedRule, pub bool, pub u8);
+
+impl Default for CurrentRule {
+    fn default() -> Self {
+        Self(SelectedRule::default(), SelectedRule::default(), true, 2)
+    }
+}
