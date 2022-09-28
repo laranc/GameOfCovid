@@ -11,7 +11,7 @@ impl Plugin for DebugPlugin {
             app.add_plugin(WorldInspectorPlugin::new())
                 .register_inspectable::<AsciiSheet>()
                 .register_inspectable::<CellComponent>()
-                .add_plugin(InspectorPlugin::<Rule>::new());
+                .add_plugin(InspectorPlugin::<GameOptions>::new());
         }
     }
 }

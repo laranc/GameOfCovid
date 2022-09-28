@@ -1,17 +1,41 @@
-use crate::{components::CellState, grid::MAP_SIZE};
+use bevy::prelude::Timer;
 use bevy_inspector_egui::Inspectable;
+use std::time::Duration;
 
-#[derive(Default)]
+use crate::{components::CellState, grid::MAP_SIZE, BASE_TICK_SPEED};
+
 pub struct CursorPosition(pub usize, pub usize);
+
+impl Default for CursorPosition {
+    fn default() -> Self {
+        Self(MAP_SIZE.0 / 2, MAP_SIZE.1 / 2)
+    }
+}
 
 #[derive(Default)]
 pub struct PrevCursorPosition(pub usize, pub usize);
+
+pub struct CameraPosition(pub usize, pub usize);
+
+impl Default for CameraPosition {
+    fn default() -> Self {
+        Self(MAP_SIZE.0 / 2, MAP_SIZE.1 / 2)
+    }
+}
 
 pub struct CellStates(pub [[CellState; MAP_SIZE.1]; MAP_SIZE.0]);
 
 impl Default for CellStates {
     fn default() -> Self {
         Self([[CellState::default(); MAP_SIZE.1]; MAP_SIZE.0])
+    }
+}
+
+pub struct GameTimer(pub Timer);
+
+impl Default for GameTimer {
+    fn default() -> Self {
+        Self(Timer::new(Duration::from_secs_f32(BASE_TICK_SPEED), true))
     }
 }
 
@@ -66,27 +90,29 @@ impl Rules {
     }
 }
 
-#[derive(Eq, PartialEq, Clone, Inspectable)]
-pub struct GameRules {
+#[derive(PartialEq, Clone, Inspectable)]
+pub struct Options {
     pub living_rule: Rules,
     pub dead_rule: Rules,
     pub virulence: u8,
+    pub tick_speed: f32,
 }
 
-impl Default for GameRules {
+impl Default for Options {
     fn default() -> Self {
         Self {
             living_rule: Rules::default(),
             dead_rule: Rules::default(),
             virulence: 2,
+            tick_speed: BASE_TICK_SPEED,
         }
     }
 }
 
 #[derive(Default, Inspectable)]
-pub struct Rule(pub GameRules);
+pub struct GameOptions(pub Options);
 
-pub struct SelectedRule {
+pub struct SelectedRules {
     pub single: bool,
     pub range: bool,
     pub singles: bool,
@@ -96,7 +122,7 @@ pub struct SelectedRule {
     pub singles_value: String,
 }
 
-impl Default for SelectedRule {
+impl Default for SelectedRules {
     fn default() -> Self {
         Self {
             single: false,
@@ -110,10 +136,32 @@ impl Default for SelectedRule {
     }
 }
 
-pub struct CurrentRule(pub SelectedRule, pub SelectedRule, pub bool, pub u8);
+pub struct SelectedOptions {
+    pub virulence: bool,
+    pub tick_speed: bool,
+    pub virulence_value: u8,
+    pub tick_speed_value: f32,
+}
 
-impl Default for CurrentRule {
+impl Default for SelectedOptions {
     fn default() -> Self {
-        Self(SelectedRule::default(), SelectedRule::default(), true, 2)
+        Self {
+            virulence: true,
+            tick_speed: true,
+            virulence_value: 2,
+            tick_speed_value: BASE_TICK_SPEED,
+        }
+    }
+}
+
+pub struct CurrentOptions(pub SelectedRules, pub SelectedRules, pub SelectedOptions);
+
+impl Default for CurrentOptions {
+    fn default() -> Self {
+        Self(
+            SelectedRules::default(),
+            SelectedRules::default(),
+            SelectedOptions::default(),
+        )
     }
 }
