@@ -1,5 +1,5 @@
 [package]
-name = "task-6-individual"
+name = "game_of_covid"
 version = "0.1.0"
 edition = "2021"
 
@@ -13,3 +13,7 @@ opt-level = 3
 bevy = { version = "0.8", features = ["dynamic"] }
 bevy-inspector-egui = "0.12.1"
 bevy_egui = "0.16.1"
+
+[[bin]]
+name = "game_of_covid"
+path = "src/main.rs"
