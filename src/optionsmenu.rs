@@ -3,9 +3,12 @@ use bevy_egui::{egui, EguiContext};
 use std::time::Duration;
 
 use crate::{
-    components::CellComponent, components::MapComponent, grid::clear_grid, resources::CellStates,
-    resources::CurrentOptions, resources::GameOptions, resources::GameTimer, resources::Options,
-    resources::Rules, resources::SelectedRules, GameState,
+    components::{CellComponent, MapComponent},
+    grid::clear_grid,
+    resources::{
+        CellStates, CurrentOptions, GameOptions, GameTimer, Options, Rules, SelectedRules,
+    },
+    GameState,
 };
 
 pub struct OptionsMenuPlugin;
@@ -29,12 +32,13 @@ fn options_menu_system(
     cell_query: Query<(&mut CellComponent, &mut TextureAtlasSprite)>,
     cell_states: ResMut<CellStates>,
 ) {
+    // open new floating window
     egui::Window::new("Options").show(egui_ctx.ctx_mut(), |ui| {
         // living cell
         ui.label("Living Cell Rule:");
         ui.checkbox(&mut current_rule.0.default, "Use default");
         if !current_rule.0.default {
-            ui.checkbox(&mut current_rule.0.single, "Use Single");
+            ui.checkbox(&mut current_rule.0.single, "Use single");
             ui.checkbox(&mut current_rule.0.range, "Use range");
             ui.checkbox(&mut current_rule.0.singles, "Use singles");
             if current_rule.0.single {
@@ -66,9 +70,9 @@ fn options_menu_system(
                 current_rule.0.single = false;
                 current_rule.0.range = false;
                 current_rule.0.default = false;
-                ui.label("List of possible neighbour values (separate by comma e.g. 1,4,7,8)");
+                ui.label("List of possible neighbour values (separate by space e.g. 1 4 7 8)");
                 ui.text_edit_singleline(&mut current_rule.0.singles_value);
-                let string_out: Vec<&str> = current_rule.0.singles_value.split(",").collect();
+                let string_out: Vec<&str> = current_rule.0.singles_value.split(" ").collect();
                 let mut singles = Vec::new();
                 for s in string_out {
                     match s.parse() {
@@ -89,7 +93,7 @@ fn options_menu_system(
         ui.label("Dead Cell Rules:");
         ui.checkbox(&mut current_rule.1.default, "Use default");
         if !current_rule.1.default {
-            ui.checkbox(&mut current_rule.1.single, "Use Single");
+            ui.checkbox(&mut current_rule.1.single, "Use single");
             ui.checkbox(&mut current_rule.1.range, "Use range");
             ui.checkbox(&mut current_rule.1.singles, "Use singles");
             if current_rule.1.single {
@@ -162,6 +166,7 @@ fn options_menu_system(
                 egui::Slider::new(&mut current_rule.2.tick_speed_value, 0.1..=1.0)
                     .text("Tick speed"),
             );
+            rule.0.tick_speed = current_rule.2.tick_speed_value;
             game_time.0 = Timer::new(Duration::from_secs_f32(rule.0.tick_speed), true);
         } else {
             current_rule.2.tick_speed = true;

@@ -1,12 +1,11 @@
-use bevy::{asset::Handle, prelude::Component, sprite::TextureAtlas};
+use bevy::prelude::Component;
 use bevy_inspector_egui::Inspectable;
 
-#[derive(Component, Inspectable)]
-pub struct AsciiSheet(pub Handle<TextureAtlas>);
-
+// define component used to identify the map entity
 #[derive(Component)]
 pub struct MapComponent;
 
+// define the possible state a cell could be in
 #[derive(PartialEq, Eq, Copy, Clone, Inspectable, Default, Debug)]
 pub enum CellState {
     Alive,
@@ -15,6 +14,7 @@ pub enum CellState {
     Infected,
 }
 
+// define component used to identify the cell entities
 #[derive(Clone, Component, Inspectable)]
 pub struct CellComponent {
     pub coord: (usize, usize),

@@ -14,6 +14,7 @@ impl Plugin for ResultMenuPlugin {
 }
 
 fn result_menu_system(mut egui_ctx: ResMut<EguiContext>, cell_states: Res<CellStates>) {
+    // count the number cells in various states
     let mut alive_count = 0.;
     let mut infected_count = 0.;
     for i in 0..cell_states.0.len() {
@@ -26,6 +27,7 @@ fn result_menu_system(mut egui_ctx: ResMut<EguiContext>, cell_states: Res<CellSt
         }
     }
     let proportion = infected_count / (alive_count + infected_count);
+    // display the percentage of infected to alive cells in a floating window
     egui::Window::new("Result Menu").show(egui_ctx.ctx_mut(), |ui| {
         ui.label("Conclusion:");
         if proportion > 0.5 {

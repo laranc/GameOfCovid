@@ -1,9 +1,10 @@
 use bevy::prelude::*;
 
 use crate::{
-    ascii::spawn_sprite, components::AsciiSheet, components::CellComponent, components::CellState,
-    components::MapComponent, resources::CameraPosition, resources::CellStates,
-    resources::CursorPosition, resources::PrevCursorPosition, GameState, TILE_SIZE,
+    ascii::spawn_sprite,
+    components::{CellComponent, CellState, MapComponent},
+    resources::{AsciiSheet, CameraPosition, CellStates, CursorPosition, PrevCursorPosition},
+    GameState, TILE_SIZE,
 };
 
 pub struct GridPlugin;
@@ -27,9 +28,10 @@ pub const MAP_SIZE: (usize, usize) = (100, 100);
 
 fn create_grid_system(mut commands: Commands, ascii: Res<AsciiSheet>) {
     let mut cells = Vec::new();
-
+    // iterate over the 2D grid
     for x in 0..MAP_SIZE.0 {
         for y in 0..MAP_SIZE.1 {
+            // make a sprite from the texture atlas
             let cell = spawn_sprite(
                 &mut commands,
                 &ascii,
@@ -37,7 +39,9 @@ fn create_grid_system(mut commands: Commands, ascii: Res<AsciiSheet>) {
                 Color::rgb(0., 0., 0.),
                 Vec3::new(x as f32 * TILE_SIZE, -(y as f32) * TILE_SIZE, 100.),
             );
+            // define the cell name based on its coordinates
             let cell_name = "Cell (".to_owned() + &x.to_string() + ", " + &y.to_string() + ")";
+            // make an entity for the cell
             commands
                 .entity(cell)
                 .insert(Name::new(cell_name))
@@ -48,7 +52,7 @@ fn create_grid_system(mut commands: Commands, ascii: Res<AsciiSheet>) {
             cells.push(cell);
         }
     }
-
+    // spawn the map entity with the cells as its children
     commands
         .spawn()
         .insert(Name::new("Map"))
@@ -84,6 +88,7 @@ fn cursor_movement_system(
     mut position: ResMut<CursorPosition>,
     mut prev_position: ResMut<PrevCursorPosition>,
 ) {
+    // update the cursor's position, and save the previous position
     if keyboard.just_released(KeyCode::A) {
         if position.0 > 0 {
             prev_position.0 = position.0;
@@ -115,6 +120,7 @@ fn cursor_movement_system(
 }
 
 fn camera_movement_system(keyboard: Res<Input<KeyCode>>, mut position: ResMut<CameraPosition>) {
+    // update the camera's position
     if keyboard.pressed(KeyCode::Left) {
         if position.0 > 0 {
             position.0 -= 1;
@@ -143,6 +149,7 @@ fn camera_update_system(
     cell_query: Query<(&CellComponent, &Transform)>,
     position: Res<CameraPosition>,
 ) {
+    // move camera to position
     let mut camera_transform = camera_query.single_mut();
     let children = map_query.single();
     for &child in children.iter() {
@@ -154,7 +161,8 @@ fn camera_update_system(
     }
 }
 
-pub fn update_sprite(state: CellState, mut sprite: Mut<TextureAtlasSprite>) -> () {
+pub fn update_sprite(state: CellState, sprite: &mut Mut<TextureAtlasSprite>) -> () {
+    // change sprite and colour based on the state
     match state {
         CellState::Alive => {
             sprite.color = Color::rgb(255., 255., 255.);
@@ -176,11 +184,12 @@ pub fn clear_grid(
     mut cell_query: Query<(&mut CellComponent, &mut TextureAtlasSprite)>,
     mut cell_states: ResMut<CellStates>,
 ) -> () {
+    // set every entity to the default state and update in the array
     let children = map_query.single();
     for &child in children.iter() {
-        let (mut cell, sprite) = cell_query.get_mut(child).unwrap();
-        cell.state = CellState::Dead;
-        update_sprite(cell.state, sprite);
-        cell_states.0[cell.coord.0][cell.coord.1] = CellState::Dead;
+        let (mut cell, mut sprite) = cell_query.get_mut(child).unwrap();
+        cell.state = CellState::default();
+        update_sprite(cell.state, &mut sprite);
+        cell_states.0[cell.coord.0][cell.coord.1] = CellState::default();
     }
 }

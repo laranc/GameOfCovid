@@ -1,6 +1,7 @@
 use bevy::prelude::*;
 use bevy_egui::{egui, EguiContext, EguiPlugin};
 
+// import files from the working directory
 mod ascii;
 mod components;
 mod debug;
@@ -10,6 +11,7 @@ mod optionsmenu;
 mod resources;
 mod resultmenu;
 
+// import the plugins
 use ascii::AsciiPlugin;
 use components::{CellComponent, MapComponent};
 use debug::DebugPlugin;
@@ -19,16 +21,19 @@ use optionsmenu::OptionsMenuPlugin;
 use resources::{CameraPosition, CellStates, CursorPosition, PrevCursorPosition};
 use resultmenu::ResultMenuPlugin;
 
+// define global game constants
 pub const RESOLUTION: f32 = 16. / 9.;
 pub const SCREEN_HEIGHT: f32 = 900.;
 pub const TILE_SIZE: f32 = 20.;
 pub const BASE_TICK_SPEED: f32 = 0.5;
 
+// define window size
 pub struct WinSize {
     pub w: f32,
     pub h: f32,
 }
 
+// implement a default value
 impl Default for WinSize {
     fn default() -> Self {
         Self {
@@ -38,6 +43,7 @@ impl Default for WinSize {
     }
 }
 
+// define the different game states as an enum
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Copy)]
 pub enum GameState {
     Paused,
@@ -46,16 +52,18 @@ pub enum GameState {
 }
 
 fn main() {
+    // create new app
     App::new()
-        .add_state(GameState::Paused)
+        .add_state(GameState::Paused) // add the game state
         .insert_resource(WindowDescriptor {
+            // insert window information
             title: "Game of Covid".to_string(),
-            width: SCREEN_HEIGHT * RESOLUTION,
-            height: SCREEN_HEIGHT,
+            width: WinSize::default().w,
+            height: WinSize::default().h,
             ..Default::default()
         })
-        .init_resource::<CellStates>()
-        .add_plugins(DefaultPlugins)
+        .init_resource::<CellStates>() // insert the cell state global resource
+        .add_plugins(DefaultPlugins) // add the plugins
         .add_plugin(AsciiPlugin)
         .add_plugin(EguiPlugin)
         .add_plugin(GridPlugin)
@@ -63,7 +71,7 @@ fn main() {
         .add_plugin(DebugPlugin)
         .add_plugin(OptionsMenuPlugin)
         .add_plugin(ResultMenuPlugin)
-        .add_startup_system(setup_system)
+        .add_startup_system(setup_system) // add the main systems
         .add_system(game_state_system)
         .add_system(controls_panel_system)
         .run();

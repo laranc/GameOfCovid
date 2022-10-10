@@ -1,6 +1,6 @@
 use bevy::prelude::*;
 
-use crate::{components::AsciiSheet, TILE_SIZE};
+use crate::{resources::AsciiSheet, TILE_SIZE};
 
 pub struct AsciiPlugin;
 
@@ -15,6 +15,7 @@ fn load_ascii_system(
     assets: Res<AssetServer>,
     mut texture_atlases: ResMut<Assets<TextureAtlas>>,
 ) {
+    // open a new texture atlas from the file
     let image = assets.load("spritesheet.png");
     let atlas = TextureAtlas::from_grid_with_padding(
         image,
@@ -24,9 +25,8 @@ fn load_ascii_system(
         Vec2::splat(2.),
         Vec2::splat(0.),
     );
-
     let atlas_handle = texture_atlases.add(atlas);
-
+    // save the texture atlas as a global resource
     commands.insert_resource(AsciiSheet(atlas_handle));
 }
 
@@ -37,10 +37,11 @@ pub fn spawn_sprite(
     color: Color,
     translation: Vec3,
 ) -> Entity {
+    // fetch sprite from texture atlas
     let mut sprite = TextureAtlasSprite::new(index);
     sprite.color = color;
     sprite.custom_size = Some(Vec2::splat(TILE_SIZE));
-
+    // return the id of the texture atlas sprite
     commands
         .spawn_bundle(SpriteSheetBundle {
             sprite,
