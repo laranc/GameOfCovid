@@ -101,7 +101,7 @@ fn game_state_system(mut state: ResMut<State<GameState>>, keyboard: Res<Input<Ke
             _ => (),
         }
     }
-    if keyboard.just_released(KeyCode::F) {
+    if keyboard.just_released(KeyCode::Escape) {
         match state.current() {
             GameState::Complete => state
                 .set(GameState::Paused)
@@ -124,11 +124,11 @@ fn controls_panel_system(
 ) {
     egui::TopBottomPanel::bottom("Controls").show(egui_ctx.ctx_mut(), |ui| {
         ui.horizontal(|ui| {
-            ui.label("Use [W][A][S][D] to move the cursor.");
-            ui.label("Press [SPACE] to change the cell.");
-            ui.label("Press [E] to to start and stop the game.");
-            ui.label("Press [F] to conclude the game.");
-            ui.label("Use arrow keys to pan the camera.");
+            ui.heading("Use [W][A][S][D] to move the cursor.");
+            ui.heading("Press [SPACE] to change the cell.");
+            ui.heading("Press [E] to to start and stop the game.");
+            ui.heading("Press [ESC] to conclude the game.");
+            ui.heading("Use arrow keys to pan the camera.");
             ui.with_layout(egui::Layout::right_to_left(egui::Align::RIGHT), |ui| {
                 if ui.button("Centre camera").clicked() {
                     let mut camera_transform = camera_query.single_mut();
@@ -136,10 +136,11 @@ fn controls_panel_system(
                     for &child in children.iter() {
                         let (cell, cell_transform) = cell_query.get(child).unwrap();
                         if cell.coord.0 == MAP_SIZE.0 / 2 && cell.coord.1 == MAP_SIZE.1 / 2 {
-                            camera_transform.translation.x = cell_transform.translation.x;
-                            camera_transform.translation.y = cell_transform.translation.y;
-                            camera_position.0 = cell.coord.0;
-                            camera_position.1 = cell.coord.1;
+                            (
+                                camera_transform.translation.x,
+                                camera_transform.translation.y,
+                            ) = (cell_transform.translation.x, cell_transform.translation.y);
+                            (camera_position.0, camera_position.1) = (cell.coord.0, cell.coord.1);
                         }
                     }
                 }
@@ -149,18 +150,17 @@ fn controls_panel_system(
                     for &child in children.iter() {
                         let (cell, cell_transform) = cell_query.get(child).unwrap();
                         if cell.coord.0 == cursor_position.0 && cell.coord.1 == cursor_position.1 {
-                            camera_transform.translation.x = cell_transform.translation.x;
-                            camera_transform.translation.y = cell_transform.translation.y;
-                            camera_position.0 = cell.coord.0;
-                            camera_position.1 = cell.coord.1;
+                            (
+                                camera_transform.translation.x,
+                                camera_transform.translation.y,
+                            ) = (cell_transform.translation.x, cell_transform.translation.y);
+                            (camera_position.0, camera_position.1) = (cell.coord.0, cell.coord.1);
                         }
                     }
                 }
                 if ui.button("Centre cursor").clicked() {
-                    prev_position.0 = cursor_position.0;
-                    prev_position.1 = cursor_position.1;
-                    cursor_position.0 = MAP_SIZE.0 / 2;
-                    cursor_position.1 = MAP_SIZE.1 / 2;
+                    (prev_position.0, prev_position.1) = (cursor_position.0, cursor_position.1);
+                    (cursor_position.0, cursor_position.1) = (MAP_SIZE.0 / 2, MAP_SIZE.1 / 2);
                 }
             });
         });

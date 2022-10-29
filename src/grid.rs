@@ -40,7 +40,7 @@ fn create_grid_system(mut commands: Commands, ascii: Res<AsciiSheet>) {
                 Vec3::new(x as f32 * TILE_SIZE, -(y as f32) * TILE_SIZE, 100.),
             );
             // define the cell name based on its coordinates
-            let cell_name = "Cell (".to_owned() + &x.to_string() + ", " + &y.to_string() + ")";
+            let cell_name = format!("Cell ({},{})", &x, &y);
             // make an entity for the cell
             commands
                 .entity(cell)
@@ -71,14 +71,19 @@ fn add_grid_system(
     mut camera_query: Query<&mut Transform, (Without<MapComponent>, Without<CellComponent>)>,
 ) {
     // add grid to array resource and centre camera
-    let mut camera_transform = camera_query.single_mut();
-    let children = map_query.single();
+    let mut camera_transform = camera_query.single_mut(); // fetch the single camera entitity's transform component
+    let children = map_query.single(); // fetch the single map entity's children
     for &child in children.iter() {
-        let (cell, cell_transform) = cell_query.get(child).unwrap();
-        cell_states.0[cell.coord.0][cell.coord.1] = cell.state;
+        // iterate over the children to access each individual entity
+        let (cell, cell_transform) = cell_query.get(child).unwrap(); // get the cell component and the transform from the entity
+        cell_states.0[cell.coord.0][cell.coord.1] = cell.state; // add the corresponding cell component to the global array resource
         if cell.coord.0 == MAP_SIZE.0 / 2 && cell.coord.1 == MAP_SIZE.1 / 2 {
-            camera_transform.translation.x = cell_transform.translation.x;
-            camera_transform.translation.y = cell_transform.translation.y;
+            // if the cell is in the centre
+            // move the camera to the position of the cell
+            (
+                camera_transform.translation.x,
+                camera_transform.translation.y,
+            ) = (cell_transform.translation.x, camera_transform.translation.y);
         }
     }
 }
@@ -91,29 +96,25 @@ fn cursor_movement_system(
     // update the cursor's position, and save the previous position
     if keyboard.just_released(KeyCode::A) {
         if position.0 > 0 {
-            prev_position.0 = position.0;
-            prev_position.1 = position.1;
+            (prev_position.0, prev_position.1) = (position.0, position.1);
             position.0 -= 1;
         }
     }
     if keyboard.just_released(KeyCode::D) {
         if position.0 < MAP_SIZE.0 - 1 {
-            prev_position.0 = position.0;
-            prev_position.1 = position.1;
+            (prev_position.0, prev_position.1) = (position.0, position.1);
             position.0 += 1;
         }
     }
     if keyboard.just_released(KeyCode::W) {
         if position.1 > 0 {
-            prev_position.0 = position.0;
-            prev_position.1 = position.1;
+            (prev_position.0, prev_position.1) = (position.0, position.1);
             position.1 -= 1;
         }
     }
     if keyboard.just_released(KeyCode::S) {
         if position.1 < MAP_SIZE.1 - 1 {
-            prev_position.0 = position.0;
-            prev_position.1 = position.1;
+            (prev_position.0, prev_position.1) = (position.0, position.1);
             position.1 += 1;
         }
     }
@@ -155,8 +156,10 @@ fn camera_update_system(
     for &child in children.iter() {
         let (cell, cell_transform) = cell_query.get(child).unwrap();
         if cell.coord.0 == position.0 && cell.coord.1 == position.1 {
-            camera_transform.translation.x = cell_transform.translation.x;
-            camera_transform.translation.y = cell_transform.translation.y;
+            (
+                camera_transform.translation.x,
+                camera_transform.translation.y,
+            ) = (cell_transform.translation.x, cell_transform.translation.y);
         }
     }
 }

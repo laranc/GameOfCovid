@@ -22,7 +22,7 @@ impl Plugin for DebugPlugin {
 fn history_panel_system(mut egui_ctx: ResMut<EguiContext>, mut history: ResMut<History>) {
     egui::SidePanel::right("History Panel").show(egui_ctx.ctx_mut(), |ui| {
         ui.horizontal(|ui| {
-            ui.label("History");
+            ui.heading("History");
             if ui.button("Clear history").clicked() {
                 history.0.clear();
             }

@@ -54,7 +54,7 @@ impl Default for GameTimer {
 }
 
 // define the alterable rules of the game
-#[derive(Default, Eq, PartialEq, Clone, Inspectable)]
+#[derive(Default, Eq, PartialEq, Inspectable)]
 pub enum Rules {
     Single(u8),
     Range {
@@ -115,7 +115,7 @@ impl Rules {
 }
 
 // define the game options
-#[derive(PartialEq, Clone, Inspectable)]
+#[derive(PartialEq, Inspectable)]
 pub struct Options {
     pub living_rule: Rules,
     pub dead_rule: Rules,
@@ -184,17 +184,17 @@ impl Default for SelectedOptions {
 }
 
 // define a wrapper for the changing rules and settings
+#[derive(Default)]
 pub struct CurrentOptions(pub SelectedRules, pub SelectedRules, pub SelectedOptions);
 
-impl Default for CurrentOptions {
-    fn default() -> Self {
-        Self(
-            SelectedRules::default(),
-            SelectedRules::default(),
-            SelectedOptions::default(),
-        )
-    }
-}
-
+// define wrapper for debugging cells that undergo change
 #[derive(Default)]
 pub struct History(pub Vec<String>);
+
+// define wrapper for the selections of the questions for the final survey
+#[derive(Default)]
+pub struct Questions(pub bool, pub bool, pub String, pub String, pub String);
+
+// define wrapper for the final results of the survey
+#[derive(Default)]
+pub struct QuestionnarieResponse(pub Vec<String>, pub bool);

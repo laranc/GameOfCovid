@@ -146,7 +146,7 @@ fn generation_system(
                 cell_states.0[i][j],
                 live_neighbors,
                 infected_neighbors,
-                options.0.clone(),
+                &options.0,
             );
         }
     }
@@ -187,10 +187,10 @@ fn cell_check(
     current_state: CellState,
     live_neighbors: u8,
     infected_neighbors: u8,
-    options: Options,
+    options: &Options,
 ) -> CellState {
     // check if the default options are in use
-    if options == Options::default() {
+    if options == &Options::default() {
         // check the cell against the criteria
         match current_state {
             CellState::Alive => {
@@ -228,7 +228,9 @@ fn cell_check(
                         CellState::Dead
                     } else if live_neighbors == i {
                         CellState::Alive
-                    } else if live_neighbors > i + 1 || infected_neighbors >= options.virulence {
+                    } else if live_neighbors > i + 1
+                        || infected_neighbors >= (8 - options.virulence)
+                    {
                         CellState::Infected
                     } else {
                         CellState::Alive
@@ -237,7 +239,9 @@ fn cell_check(
                 Rules::Range { min: _, max: u } => {
                     if !options.living_rule.in_range(&live_neighbors) {
                         CellState::Dead
-                    } else if live_neighbors > u + 1 || infected_neighbors >= options.virulence {
+                    } else if live_neighbors > u + 1
+                        || infected_neighbors >= (8 - options.virulence)
+                    {
                         CellState::Infected
                     } else {
                         CellState::Alive
@@ -247,7 +251,7 @@ fn cell_check(
                     if !options.living_rule.in_range(&live_neighbors) {
                         CellState::Dead
                     } else if live_neighbors > options.living_rule.max()
-                        || infected_neighbors >= options.virulence
+                        || infected_neighbors >= (8 - options.virulence)
                     {
                         CellState::Infected
                     } else {
