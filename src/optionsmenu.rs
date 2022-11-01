@@ -150,7 +150,7 @@ fn options_menu_system(
         if !current_rule.2.virulence {
             ui.add(
                 egui::Slider::new(&mut current_rule.2.virulence_value, 0..=8)
-                    .text("Number of neighbours"),
+                    .text("Higher = more infectious"),
             );
             rule.0.virulence = current_rule.2.virulence_value;
         } else {

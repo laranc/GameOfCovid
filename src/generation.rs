@@ -259,7 +259,7 @@ fn cell_check(
                     }
                 }
                 _ => {
-                    if live_neighbors < 2 {
+                    if live_neighbors < 2 || (options.virulence == 0 && live_neighbors > 3) {
                         CellState::Dead
                     } else if live_neighbors == 2 || live_neighbors == 3 {
                         CellState::Alive
